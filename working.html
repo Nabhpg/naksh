@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Working — NAKSH · How the campus pathfinder thinks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="css/style.css?v=2" rel="stylesheet" />
+  <link href="css/working.css?v=5" rel="stylesheet" />
+</head>
+<body class="working">
+  <div id="fx-grain"></div>
+
+  <header id="header" class="ui">
+    <a class="logo" href="index.html" aria-label="NAKSH map">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 2 L30 16 L16 30 L2 16 Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M16 8 L24 16 L16 24 L8 16 Z" fill="none" stroke="currentColor" stroke-width="0.8" opacity=".6"/>
+        <circle cx="16" cy="16" r="1.8" fill="currentColor"/>
+      </svg>
+      <span class="logo-word">NAKSH</span>
+    </a>
+    <span class="logo-tag">Campus Cartography <em>·</em> Chandigarh University</span>
+    <nav id="nav" class="nav">
+      <a href="index.html">Map</a>
+      <a href="working.html" class="active">Working</a>
+      <a href="team.html">Team</a>
+    </nav>
+    <div class="read-progress"><i id="read-progress"></i></div>
+  </header>
+
+  <!-- chapter rail -->
+  <nav class="rail" id="rail" aria-label="Chapters">
+    <a href="#hero" data-ch="hero"><b>◆</b><span>Prologue</span></a>
+    <a href="#ch1" data-ch="ch1"><b>I</b><span>Roads become a graph</span></a>
+    <a href="#ch2" data-ch="ch2"><b>II</b><span>Adjacency list</span></a>
+    <a href="#ch3" data-ch="ch3"><b>III</b><span>Min-heap</span></a>
+    <a href="#ch4" data-ch="ch4"><b>IV</b><span>Dijkstra</span></a>
+    <a href="#ch5" data-ch="ch5"><b>V</b><span>Complexity</span></a>
+    <a href="#ch6" data-ch="ch6"><b>VI</b><span>Pipeline</span></a>
+    <a href="#ch7" data-ch="ch7"><b>VII</b><span>Tech stack</span></a>
+  </nav>
+
+  <main>
+    <!-- PROLOGUE -->
+    <section class="hero" id="hero" data-ch="hero">
+      <canvas id="hero-graph"></canvas>
+      <div class="hero-copy">
+        <div class="kicker">Working · Advanced Data Structures &amp; Algorithms</div>
+        <h1>How NAKSH<br><em>finds the way</em></h1>
+        <p class="lede">Chandigarh University, reduced to what an algorithm can reason about: points where paths meet, and the
+          distance between them. Then one idea, applied without shortcuts or guesses: always expand the nearest place first.</p>
+        <div class="hero-stats">
+          <div><b data-count="V">0</b><span>vertices</span></div>
+          <div><b data-count="E">0</b><span>edges</span></div>
+          <div><b data-count="P">0</b><span>places</span></div>
+        </div>
+        <div class="hero-hint"><span class="pulse-dot"></span>Click anywhere on the campus graph to send a Dijkstra wave from that junction</div>
+      </div>
+      <div class="hero-readout" id="hero-readout"></div>
+      <a class="hero-scroll" href="#ch1"><span>Begin</span><i></i></a>
+    </section>
+
+    <!-- I -->
+    <section class="chapter" id="ch1" data-ch="ch1">
+      <header class="ch-head">
+        <div class="numeral">I</div>
+        <div>
+          <div class="kicker">Modelling</div>
+          <h2>Roads become <em>a graph</em></h2>
+          <p class="lede">OpenStreetMap stores every campus road as a list of GPS points. Each pair of neighbouring points
+            becomes an <b>edge</b>, and its <b>weight</b> is the real distance between them on the Earth's surface, worked out
+            with the haversine formula.</p>
+        </div>
+      </header>
+      <div class="duo">
+        <div class="codecard" id="code-road"></div>
+        <div class="stage">
+          <div class="stage-title"><span>A real road, taken from the campus data</span><span id="road-name" class="dim"></span></div>
+          <svg id="stage-road" class="svgstage"></svg>
+          <div class="stage-foot"><div><span class="k">Segments</span><b id="road-seg">0</b></div><div><span class="k">Total length</span><b id="road-len">0 m</b></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- II -->
+    <section class="chapter" id="ch2" data-ch="ch2">
+      <header class="ch-head">
+        <div class="numeral">II</div>
+        <div>
+          <div class="kicker">Representation</div>
+          <h2>Every vertex <em>remembers its neighbours</em></h2>
+          <p class="lede">A campus graph is <b>sparse</b>: a junction touches two or three paths, never hundreds. So instead of
+            a V×V matrix that would be mostly empty, NAKSH keeps an <b>adjacency list</b>. Each vertex holds only the edges it
+            actually has, so memory is O(V + E).</p>
+        </div>
+      </header>
+      <div class="duo">
+        <div class="codecard" id="code-adj"></div>
+        <div class="stage">
+          <div class="stage-title"><span>Ten real places · walking distances in metres</span></div>
+          <svg id="stage-adj" class="svgstage"></svg>
+          <div class="adj-table" id="adj-table"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- III -->
+    <section class="chapter" id="ch3" data-ch="ch3">
+      <header class="ch-head">
+        <div class="numeral">III</div>
+        <div>
+          <div class="kicker">Data structure</div>
+          <h2>The min-heap <em>always knows what's closest</em></h2>
+          <p class="lede">Dijkstra keeps asking one question: <i>which unsettled place is nearest?</i> A binary min-heap
+            answers it in O(log n). It's a tree stored inside a flat array: the parent of index i sits at ⌊(i−1)/2⌋, and
+            no parent is ever larger than its children.</p>
+        </div>
+      </header>
+      <div class="duo">
+        <div class="codecard" id="code-heap"></div>
+        <div class="stage">
+          <div class="stage-title"><span>Heap as a tree</span><span class="dim">and as the array it really is</span></div>
+          <svg id="stage-heap" class="svgstage tall"></svg>
+          <div class="heap-array" id="heap-array"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IV -->
+    <section class="chapter wide" id="ch4" data-ch="ch4">
+      <header class="ch-head">
+        <div class="numeral">IV</div>
+        <div>
+          <div class="kicker">The algorithm</div>
+          <h2>Dijkstra, <em>one decision at a time</em></h2>
+          <p class="lede">Take the nearest unsettled place from the heap and lock its distance: nothing found later can beat it,
+            because every edge length is positive. Then try every path leading out of it. If going through it is shorter, write
+            the new distance down and remember where you came from. Repeat until the destination is locked.</p>
+        </div>
+      </header>
+      <div class="dj-controls">
+        <label>From <select id="dj-from"></select></label>
+        <span class="arrow">→</span>
+        <label>To <select id="dj-to"></select></label>
+      </div>
+      <div class="duo dj">
+        <div class="codecard" id="code-dj"></div>
+        <div class="stage">
+          <svg id="stage-dj" class="svgstage tall"></svg>
+          <div class="pq">
+            <div class="pq-head"><span>Priority queue</span><span class="dim">smallest distance first</span></div>
+            <div class="pq-items" id="pq-items"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- V -->
+    <section class="chapter" id="ch5" data-ch="ch5">
+      <header class="ch-head">
+        <div class="numeral">V</div>
+        <div>
+          <div class="kicker">Analysis</div>
+          <h2>Why it answers <em>in a millisecond</em></h2>
+          <p class="lede">With a heap, each vertex is settled once and each edge is relaxed at most twice, and every heap
+            operation costs O(log V). Without a heap, picking the nearest vertex means scanning all of them every time.</p>
+        </div>
+      </header>
+      <div class="complexity">
+        <div class="cx-card">
+          <div class="k">Linear scan for the minimum</div>
+          <div class="formula">O(V²)</div>
+          <div class="cx-num"><b id="cx-naive">0</b><span>steps for this campus</span></div>
+          <div class="bar"><i id="bar-naive"></i></div>
+        </div>
+        <div class="cx-card gold">
+          <div class="k">Binary min-heap · what NAKSH uses</div>
+          <div class="formula">O((V + E) log V)</div>
+          <div class="cx-num"><b id="cx-heap">0</b><span>steps for this campus</span></div>
+          <div class="bar"><i id="bar-heap"></i></div>
+        </div>
+        <div class="cx-verdict"><b id="cx-ratio">—</b><span>less work on the real CU graph</span></div>
+      </div>
+      <div class="bench">
+        <div class="bench-copy">
+          <div class="kicker">Measured, not claimed</div>
+          <h3>Run it in your own browser</h3>
+          <p>Picks random pairs of campus places and times the real Dijkstra code that powers the map, after a short warm-up.</p>
+          <button id="bench-run" class="btn-gold">Run 500 random routes</button>
+        </div>
+        <div class="bench-out">
+          <div class="bench-grid">
+            <div><span class="k">Average time</span><b id="b-avg">—</b></div>
+            <div><span class="k">Slowest</span><b id="b-max">—</b></div>
+            <div><span class="k">Avg. vertices settled</span><b id="b-set">—</b></div>
+            <div><span class="k">Graph explored</span><b id="b-pct">—</b></div>
+          </div>
+          <canvas id="bench-spark"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- VI -->
+    <section class="chapter" id="ch6" data-ch="ch6">
+      <header class="ch-head">
+        <div class="numeral">VI</div>
+        <div>
+          <div class="kicker">Architecture</div>
+          <h2>From raw map data <em>to your screen</em></h2>
+          <p class="lede">The heavy work happens once, ahead of time. A Python script turns the raw OpenStreetMap download
+            into a compact graph. The browser then only loads that file, runs Dijkstra and draws the result.</p>
+        </div>
+      </header>
+      <div class="pipeline" id="pipeline">
+        <svg class="pipe-line" id="pipe-line" preserveAspectRatio="none"></svg>
+        <div class="station"><div class="st-mark">01</div><h4>OpenStreetMap</h4><p>Raw roads, buildings and names for the campus area, from the OSM API</p><code>osm_map.json</code></div>
+        <div class="station"><div class="st-mark">02</div><h4>build_data.py</h4><p>Splits roads into edges, computes haversine weights, keeps the connected part, links each building to its nearest path</p><code>Python 3</code></div>
+        <div class="station"><div class="st-mark">03</div><h4>cu_data.js</h4><p>The graph as compact arrays, plus building footprints as GeoJSON</p><code id="pipe-size">— vertices</code></div>
+        <div class="station"><div class="st-mark">04</div><h4>dijkstra.js</h4><p>Adjacency list, binary min-heap and Dijkstra, recording every step it takes</p><code>O((V+E) log V)</code></div>
+        <div class="station"><div class="st-mark">05</div><h4>MapLibre GL</h4><p>Draws the satellite image, 3D buildings and the animated route on the GPU</p><code>WebGL</code></div>
+      </div>
+    </section>
+
+    <!-- VII -->
+    <section class="chapter" id="ch7" data-ch="ch7">
+      <header class="ch-head">
+        <div class="numeral">VII</div>
+        <div>
+          <div class="kicker">Built with</div>
+          <h2>The complete <em>tech stack</em></h2>
+          <p class="lede">No framework and no backend: a static site, an offline data pipeline, and the browser's GPU.</p>
+        </div>
+      </header>
+      <div class="stack" id="stack">
+        <div class="tech"><span class="cat">Algorithm</span><h4>Dijkstra's algorithm</h4><p>Single-source shortest path on a weighted, undirected graph with early exit at the target</p></div>
+        <div class="tech"><span class="cat">Data structure</span><h4>Binary min-heap</h4><p>Priority queue with lazy deletion. Push and pop in O(log n)</p></div>
+        <div class="tech"><span class="cat">Data structure</span><h4>Adjacency list</h4><p>Sparse graph storage in O(V + E)</p></div>
+        <div class="tech"><span class="cat">Language</span><h4>JavaScript (ES2020)</h4><p>All logic in plain JavaScript: graph, heap, algorithm, animation</p></div>
+        <div class="tech"><span class="cat">Map engine</span><h4>MapLibre GL JS</h4><p>Open-source WebGL map renderer: 3D building extrusions, route gradients, feature hover states</p></div>
+        <div class="tech"><span class="cat">Imagery</span><h4>Esri World Imagery</h4><p>Satellite tiles of the campus, toned down to sepia in the renderer</p></div>
+        <div class="tech"><span class="cat">Geodata</span><h4>OpenStreetMap</h4><p>Community-mapped roads, footpaths and buildings (ODbL licence)</p></div>
+        <div class="tech"><span class="cat">Pipeline</span><h4>Python 3</h4><p>Offline build: haversine weights, graph connectivity, manual fixes for gaps in the data</p></div>
+        <div class="tech"><span class="cat">Graphics</span><h4>WebGL · GLSL</h4><p>A fragment shader draws the cloud deck in the intro, using fractal noise</p></div>
+        <div class="tech"><span class="cat">Graphics</span><h4>Canvas 2D &amp; SVG</h4><p>The loading animation, this page's live graph and the step-by-step diagrams</p></div>
+        <div class="tech"><span class="cat">Interface</span><h4>HTML5 &amp; CSS3</h4><p>Glass panels, grid layouts, transitions. No UI framework</p></div>
+        <div class="tech"><span class="cat">Typography</span><h4>Cormorant · Manrope · Plex Mono</h4><p>A serif for titles, a sans-serif for interface text, a monospace for code</p></div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="logo-word">NAKSH</div>
+      <p>An Advanced Data Structures &amp; Algorithms project · Chandigarh University</p>
+      <a href="index.html" class="btn-gold">Open the map</a>
+    </footer>
+  </main>
+
+  <div id="edge-tip" class="edge-tip"></div>
+
+  <script src="data/cu_data.js"></script>
+  <script src="js/dijkstra.js?v=2"></script>
+  <script src="js/working.js?v=7"></script>
+</body>
+</html>

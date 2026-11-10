@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team — NAKSH · Chandigarh University</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="css/style.css?v=2" rel="stylesheet" />
+  <link href="css/team.css?v=1" rel="stylesheet" />
+</head>
+<body class="team">
+  <canvas id="team-graph"></canvas>
+  <div id="fx-vignette"></div>
+  <div id="fx-grain"></div>
+
+  <header id="header" class="ui">
+    <a class="logo" href="index.html" aria-label="NAKSH map">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 2 L30 16 L16 30 L2 16 Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M16 8 L24 16 L16 24 L8 16 Z" fill="none" stroke="currentColor" stroke-width="0.8" opacity=".6"/>
+        <circle cx="16" cy="16" r="1.8" fill="currentColor"/>
+      </svg>
+      <span class="logo-word">NAKSH</span>
+    </a>
+    <span class="logo-tag">Campus Cartography <em>·</em> Chandigarh University</span>
+    <nav id="nav" class="nav">
+      <a href="index.html">Map</a>
+      <a href="working.html">Working</a>
+      <a href="team.html" class="active">Team</a>
+    </nav>
+  </header>
+
+  <main class="makers">
+    <div class="m-head">
+      <div class="kicker">The makers</div>
+      <h1>Two points, <em>one path</em></h1>
+    </div>
+
+    <div class="pair">
+      <article class="maker a" data-tilt>
+        <div class="mono"><svg viewBox="0 0 120 120"><circle class="orbit" cx="60" cy="60" r="56"/><circle class="orbit2" cx="60" cy="60" r="48"/></svg><span>NG</span></div>
+        <span class="badge-pt">A</span>
+        <h2 class="name" data-split>Nabh Priya Gautam</h2>
+        <dl>
+          <div><dt>UID</dt><dd>25BCS11922</dd></div>
+          <div><dt>Section</dt><dd>704-A</dd></div>
+        </dl>
+      </article>
+
+      <div class="link" aria-hidden="true"><span class="link-line"><i></i></span><span class="link-dia">◆</span></div>
+
+      <article class="maker b" data-tilt>
+        <div class="mono"><svg viewBox="0 0 120 120"><circle class="orbit" cx="60" cy="60" r="56"/><circle class="orbit2" cx="60" cy="60" r="48"/></svg><span>AR</span></div>
+        <span class="badge-pt">B</span>
+        <h2 class="name" data-split>Aman Raj</h2>
+        <dl>
+          <div><dt>UID</dt><dd>25BCS11613</dd></div>
+          <div><dt>Section</dt><dd>704-A</dd></div>
+        </dl>
+      </article>
+    </div>
+
+    <p class="credit">Advanced Data Structures &amp; Algorithms <em>·</em> Section 704-A <em>·</em> Chandigarh University</p>
+  </main>
+
+  <script src="data/cu_data.js"></script>
+  <script src="js/dijkstra.js?v=2"></script>
+  <script src="js/team.js?v=1"></script>
+</body>
+</html>

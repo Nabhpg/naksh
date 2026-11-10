@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NAKSH — Campus Cartography · Chandigarh University</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <link href="css/style.css?v=2" rel="stylesheet" />
+</head>
+<body>
+  <!-- map -->
+  <div id="map"></div>
+  <div id="fx-tint"></div>
+  <div id="fx-vignette"></div>
+  <div id="fx-grain"></div>
+
+  <!-- intro: clouds -->
+  <canvas id="clouds"></canvas>
+  <div id="intro">
+    <div class="intro-kicker">Chandigarh University</div>
+    <h1 class="intro-title">NAKSH</h1>
+    <div class="intro-rule"><span></span><i>◆</i><span></span></div>
+    <div class="intro-sub">Every path across campus, solved by Dijkstra.</div>
+    <div class="scroll-hint"><div class="scroll-line"><i></i></div>Scroll to descend</div>
+  </div>
+
+  <!-- header -->
+  <header id="header" class="ui hidden">
+    <a class="logo" href="#" aria-label="NAKSH home">
+      <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 2 L30 16 L16 30 L2 16 Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M16 8 L24 16 L16 24 L8 16 Z" fill="none" stroke="currentColor" stroke-width="0.8" opacity=".6"/>
+        <circle cx="16" cy="16" r="1.8" fill="currentColor"/>
+      </svg>
+      <span class="logo-word">NAKSH</span>
+    </a>
+    <span class="logo-tag">Campus Cartography <em>·</em> Chandigarh University</span>
+    <!-- page links go here (reserved for future pages) -->
+    <nav id="nav" class="nav">
+      <a href="index.html" class="active">Map</a>
+      <a href="working.html">Working</a>
+      <a href="team.html">Team</a>
+    </nav>
+  </header>
+
+  <div id="prompt" class="prompt ui hidden"><span class="dot"></span><span id="prompt-text">Select your starting point</span></div>
+
+  <!-- right-side vertical toolbar -->
+  <aside id="toolbar" class="ui hidden">
+    <button id="btn-view" class="tool" data-label="Satellite view">
+      <svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 13 9 5 9-5"/><path d="m3 17.5 9 5 9-5" opacity=".5"/></svg>
+    </button>
+    <button id="btn-3d" class="tool active" data-label="3D buildings">
+      <svg viewBox="0 0 24 24"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7L12 2.5Z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/></svg>
+    </button>
+    <button id="btn-home" class="tool" data-label="Recenter campus">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.6" class="fill"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></svg>
+    </button>
+    <span class="tool-sep"></span>
+    <button id="btn-reset" class="tool" data-label="Clear route">
+      <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 3.5V8h4.5"/></svg>
+    </button>
+  </aside>
+
+  <!-- bottom-left: route card (A/B chips; details expand once both are chosen) -->
+  <section id="card" class="ui hidden">
+    <div class="points">
+      <button id="pt-a" class="pt pt-a">
+        <span class="badge">A</span>
+        <span class="pt-text"><small>Origin</small><b id="sel-a">Choose on map</b></span>
+      </button>
+      <span class="pt-link"></span>
+      <button id="pt-b" class="pt pt-b">
+        <span class="badge">B</span>
+        <span class="pt-text"><small>Destination</small><b id="sel-b">Choose on map</b></span>
+      </button>
+    </div>
+    <div class="details" id="details">
+      <div class="details-inner">
+        <div class="hero-stats">
+          <div><div class="k">Distance</div><div class="v big" id="st-dist">—</div></div>
+          <div><div class="k">Walk time</div><div class="v big" id="st-time">—</div></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="k">Nodes settled</div><div class="v" id="st-settled">—</div></div>
+          <div class="stat"><div class="k">Edges relaxed</div><div class="v" id="st-relax">—</div></div>
+          <div class="stat"><div class="k">Path nodes</div><div class="v" id="st-pathn">—</div></div>
+          <div class="stat"><div class="k">Compute</div><div class="v" id="st-ms">—</div></div>
+        </div>
+        <div class="algo-log">Dijkstra · min-heap · <b id="g-v">0</b> V · <b id="g-e">0</b> E</div>
+      </div>
+    </div>
+  </section>
+
+  <div id="legend" class="ui hidden">
+    <div><i class="lg lg-acad"></i>Academic</div>
+    <div><i class="lg lg-host"></i>Residence</div>
+    <div><i class="lg lg-other"></i>Amenities</div>
+    <div><i class="lg lg-wave"></i>Search frontier</div>
+    <div><i class="lg lg-path"></i>Shortest path</div>
+  </div>
+
+  <div id="tooltip"><div class="tt-kind"></div><div class="tt-name"></div><div class="tt-hint"></div></div>
+
+  <!-- loader -->
+  <div id="loader">
+    <canvas id="loader-canvas"></canvas>
+    <div class="loader-center">
+      <svg class="loader-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M16 2 L30 16 L16 30 L2 16 Z" fill="none" stroke="currentColor" stroke-width=".8"/>
+        <path d="M16 8 L24 16 L16 24 L8 16 Z" fill="none" stroke="currentColor" stroke-width=".6" opacity=".6"/>
+        <circle cx="16" cy="16" r="1.4" fill="currentColor"/>
+      </svg>
+      <div class="loader-title">NAKSH</div>
+      <div class="loader-bar"><i id="loader-bar"></i></div>
+      <div class="loader-meta"><span id="loader-status">Initialising</span><span><span id="loader-pct">000</span>%</span></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="js/loader.js"></script>
+  <script src="data/cu_data.js"></script>
+  <script src="js/dijkstra.js?v=2"></script>
+  <script src="js/clouds.js"></script>
+  <script src="js/app.js?v=3"></script>
+</body>
+</html>

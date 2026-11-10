@@ -1,0 +1,9 @@
+# build output (recreated by tools/deploy.sh)
+dist/
+
+# local tool state
+.netlify/
+.claude/
+__pycache__/
+*.pyc
+.DS_Store
