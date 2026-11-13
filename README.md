@@ -7,7 +7,7 @@ Shortest-path navigation across Chandigarh University, built on the real campus 
 
 Advanced Data Structures & Algorithms project, Section 704-A:
 - Nabh Priya Gautam (25BCS11922)
-- Aman Raj (25BCS11613)
+- Ritika Rana (25BCS10664)
 
 ## Pages
 - `index.html`: the map. Pick A and B, watch Dijkstra explore, see the shortest path.
