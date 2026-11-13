@@ -5,7 +5,7 @@ Shortest-path navigation across Chandigarh University, built on the real campus 
 
 **Live:** https://naksh-cu.netlify.app
 
-Advanced Data Structures & Algorithms project, Section 704-A:
+Advanced Data Structures & Algorithms project, Sections 704-A & 706-A:
 - Nabh Priya Gautam (25BCS11922)
 - Ritika Rana (25BCS10664)
 
